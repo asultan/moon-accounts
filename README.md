@@ -9,6 +9,16 @@
 ![](https://img.shields.io/badge/jwt-✓-blue.svg)
 ![](https://img.shields.io/badge/swagger_2-✓-blue.svg)
 
+# Pre-requisites
+While using the commands below to operate the applicatio, we will assume that you have the following folder structure:
+```sh
+moon
+ |__ moon-accounts
+ |__ moon-deploy
+ 
+```
+All the coomands must be run from the **moon** folder.
+
 # Storage Details
 This service is using a MySQL database, configured to run locally. A default user can be created when the app starts. 
 To enable this change the `accounts.database.DefaultDataInitializer.initData` property to `true`.
