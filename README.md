@@ -81,15 +81,14 @@ $ curl -X GET http://localhost:8081/accounts/whoami
 
 Make a POST request to `/accounts/security/login` with the default admin user (that we programmatically created) to get a valid JWT token
 ```sh
-$ curl -X POST 'http://localhost:8081/accounts/login
+$ curl -X POST 'http://localhost:8081/accounts/security/login
 body: 
 {
-    "email": "god@email.com",
-    "password": "god!"
+    "email": "admin@moon.io",
+    "password": "admin"
 }
 
 ```
-
 Add the JWT token as a Header parameter and make the initial GET request to `/accounts/security/whoami` again
 ```
 $ curl -X GET http://localhost:8081/accounts/whoami -H 'Authorization: Bearer <JWT_TOKEN>'
@@ -99,10 +98,10 @@ And that's it, congrats! You should get a similar response to this one, meaning 
 ```javascript
 {
   "id": 1,
-  "email": "god@email.com",
+  "email": "admin@moon.io",
   "role": {
     "id": 1,
-    "authority": "GOD"    
+    "authority": "ADMIN"    
    }
 }
 ```
