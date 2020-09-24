@@ -109,3 +109,22 @@ And that's it, congrats! You should get a similar response to this one, meaning 
    }
 }
 ```
+
+# The REST API
+In the `/moon/moon-accounts/src/test/resources` folder you will find the MOON-ACCOUNTS Postman collection and the LOCAL env setup. Import these 2 files in Postman and you can play with the API. 
+Make sure you check the Pre-Request section of request to understand how the request gets authenticated. 
+
+# Is it an asynchronious moon?
+- The Users endpoints run asynchronious (for demo purpose) 
+- The Tomcat embedded webserver runs using a single thread. 
+- The /users (find all) endpoint has an artificial delay of 20s
+
+Go to Postman and perform the following operations and observe what happens:
+- Fire a *Find all users* request
+- Imediateley do a *Find user by id* request. 
+- You will notice that the same thread handles both requests
+- And you will also notice that the response from the second request comes back first. 
+- After the 20s delay, the first request will return a response.  
+
+# Do you have questions?
+Feel free to contant me at sultanalex@gmail.com
