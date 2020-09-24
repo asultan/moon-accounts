@@ -126,5 +126,9 @@ Go to Postman and perform the following operations and observe what happens:
 - And you will also notice that the response from the second request comes back first. 
 - After the 20s delay, the first request will return a response.  
 
+# How do I activate a user?
+The `/security/register` endpoint returns a verification token. In a prod like app, this would not be part of the response, but it would have been sent via email, in order to build a URL that the user can click to activate the account.
+Having only the REST API, one would need to pass the verification token in the request body of the `security/activate` request. 
+
 # Do you have questions?
 Feel free to contact me at sultanalex@gmail.com
