@@ -1,7 +1,7 @@
 package accounts.service;
 
-import accounts.dto.request.UpdateUserPersonalInfoRequestDTO;
 import accounts.dto.request.UpdateUserPasswordRequestDTO;
+import accounts.dto.request.UpdateUserPersonalInfoRequestDTO;
 import accounts.dto.response.UserResponseDTO;
 import accounts.exception.CustomException;
 import accounts.model.Role;
@@ -9,10 +9,12 @@ import accounts.model.User;
 import accounts.model.UserPersonalInfo;
 import accounts.repository.UserRepository;
 import com.google.common.base.Strings;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.util.StringUtils;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,33 +42,20 @@ public class UserService {
         this.modelMapper = modelMapper;
     }
 
-    public List<UserResponseDTO> findAll(Boolean fetchPersonalInfo) {
-        final var fetchPersonalInfoNotNull = Boolean.TRUE.equals(fetchPersonalInfo); // trick to transform fetchPersonalInfo null to false
-
-        log.debug("Finding all users, fetchPersonalInfo={}", fetchPersonalInfoNotNull);
-
+    @SneakyThrows
+    @Async("asyncExecutor")
+    public CompletableFuture<List<UserResponseDTO>> findAll() {
+        Thread.sleep(20000); // artificial delay
+        log.debug("Finding all users");
         final var users = userRepository.findAll().stream()
-                .map(user -> mapUserToUserResponseDTO(user, fetchPersonalInfoNotNull))
+                .map(user -> modelMapper.map(user, UserResponseDTO.class))
                 .collect(Collectors.toList());
-
         log.debug("Found {} users", users.size());
-        return users;
+        return CompletableFuture.completedFuture(users);
     }
 
-    private UserResponseDTO mapUserToUserResponseDTO(User user, Boolean fetchPersonalInfo) {
-        final var userResponseDto = UserResponseDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .activated(user.getActivated())
-                .role(user.getRole())
-                .build();
-        if (fetchPersonalInfo) {
-            userResponseDto.setPersonalInfo(user.getPersonalInfo());
-        }
-        return userResponseDto;
-    }
-
-    public UserResponseDTO findById(Long id) {
+    @Async("asyncExecutor")
+    public CompletableFuture<UserResponseDTO> findById(Long id) {
         log.debug("Finding user by id {}", id);
 
         final var user = userRepository.findById(id);
@@ -75,7 +65,7 @@ public class UserService {
         }
 
         log.debug("Found user => {}", user.get().toString());
-        return modelMapper.map(user.get(), UserResponseDTO.class);
+        return CompletableFuture.completedFuture(modelMapper.map(user.get(), UserResponseDTO.class));
     }
 
     public User findByEmail(String email) {
@@ -119,7 +109,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User createActivatedUser(@NotEmpty String email, @NotEmpty String password, @NotNull UserPersonalInfo personalInfo, @NotEmpty Role role) {
+    public User createActivatedUser(@NotEmpty String email, @NotEmpty String password, @NotNull UserPersonalInfo personalInfo,
+                                    @NotEmpty Role role) {
         log.debug("Creating activated user with email={}, personalInfo={}, role={}", email, personalInfo, role);
 
         final var user = User.builder()
@@ -134,7 +125,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserResponseDTO updatePasswordById(Long id, UpdateUserPasswordRequestDTO updateUserRequestDTO) {
+    @Async("asyncExecutor")
+    public CompletableFuture<UserResponseDTO> updatePasswordById(Long id, UpdateUserPasswordRequestDTO updateUserRequestDTO) {
         log.debug("Updating user's password by user id {}", id);
 
         final var optionalUser = userRepository.findById(id);
@@ -150,10 +142,11 @@ public class UserService {
 
         log.debug("Saving user => {}", user);
         user = userRepository.save(user);
-        return modelMapper.map(user, UserResponseDTO.class);
+        return CompletableFuture.completedFuture(modelMapper.map(user, UserResponseDTO.class));
     }
 
-    public UserResponseDTO updatePersonalInfo(Long id, UpdateUserPersonalInfoRequestDTO updateUserPersonalInfoRequestDto) {
+    @Async("asyncExecutor")
+    public CompletableFuture<UserResponseDTO> updatePersonalInfo(Long id, UpdateUserPersonalInfoRequestDTO updateUserPersonalInfoRequestDto) {
         log.debug("Updating personal info of user with id {}", id);
 
         final var user = userRepository.findById(id);
@@ -177,12 +170,12 @@ public class UserService {
 
         log.debug("Saving user => {}", user);
         userRepository.save(user.get());
-        return modelMapper.map(user.get(), UserResponseDTO.class);
+        return CompletableFuture.completedFuture(modelMapper.map(user.get(), UserResponseDTO.class));
     }
 
+    @Async("asyncExecutor")
     public void deleteById(Long id) {
         log.debug("Deleting user with id {}", id);
-
-        userRepository.deleteById(id);
+        CompletableFuture.runAsync(() -> userRepository.deleteById(id));
     }
 }

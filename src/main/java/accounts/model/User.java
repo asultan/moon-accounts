@@ -44,7 +44,7 @@ public class User {
     private Role role;
 
     @NotNull
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private UserPersonalInfo personalInfo;
 
     @ToString.Exclude

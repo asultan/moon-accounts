@@ -1,0 +1,667 @@
+{
+	"info": {
+		"_postman_id": "a3a2980f-9d7a-41dd-8b4e-c3a8451e7c28",
+		"name": "MOON-ACCOUNTS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SECURITY",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{USER_EMAIL}}\",\r\n  \"firstName\": \"Ducu\",\r\n  \"lastName\": \"Sultan\",\r\n  \"phoneNumber\": \"+40745191662\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/security/register-user",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"security",
+								"register-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"token\": \"OTVkMWZhYTgtYzMzNS00M2Q5LWI4ZTAtZDZjZTRmMTgwYmM1\",\r\n  \"password\": \"{{USER_PASSWORD}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/security/activate-user",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"security",
+								"activate-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{USER_EMAIL}}\",\r\n    \"password\": \"{{USER_PASSWORD}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/security/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"security",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Who Am I?",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f6e84e72-8246-4ba0-9dc7-0b4449446da2",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('ADMIN_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('ADMIN_PASSWORD')\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/security/whoami",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"security",
+								"whoami"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh JWT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/security/refresh",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"security",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "ROLES",
+			"item": [
+				{
+					"name": "Find All Roles",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b9e05282-ee8f-4ba5-ae6e-29db07aadadd",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('ADMIN_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('ADMIN_PASSWORD')\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/roles",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "USERS",
+			"item": [
+				{
+					"name": "Find All Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "886f4ee2-99cd-498e-83e4-f1baf9b39a9b",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('ADMIN_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('ADMIN_PASSWORD')\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Use By Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3dc7e61b-5cd7-4209-8451-da0cb41a0f18",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('ADMIN_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('ADMIN_PASSWORD')\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users/1",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Password (being logged in)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "99cdff9f-4b99-4463-b504-8bc0bc7ae169",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('USER_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('USER_PASSWORD')\r",
+									"            // \"password\": pm.environment.get('USER_NEW_PASSWORD') // USE NEW PASSWORD FOR LOGIN AFTER CHANGING THE PASSWORD\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\": \"{{USER_NEW_PASSWORD}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users/2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User By Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3ac2401e-f760-4984-9017-07ba82e10ce9",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('ADMIN_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('ADMIN_PASSWORD')\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/users/2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Personal Info By Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c363a55a-1cb1-449c-ae04-eb3d499d7821",
+								"exec": [
+									"const rqs = {\r",
+									"    url: 'http://localhost:8081/accounts/security/login',\r",
+									"    method: 'POST',\r",
+									"    header: 'Content-Type:application/json',\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": pm.environment.get('USER_EMAIL'),\r",
+									"\t\t\t\"password\": pm.environment.get('USER_PASSWORD')\r",
+									"            // \"password\": pm.environment.get('USER_PASSWORD') // USE NEW PASSWORD FOR LOGIN AFTER CHANGING THE PASSWORD\r",
+									"        })\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"console.log(rqs);\r",
+									"\r",
+									"pm.sendRequest(rqs, (err, res) => {\r",
+									"    console.log(res);\r",
+									"    const { jwt } = res.json();\r",
+									"    pm.environment.set('JWT', res.json().jwt);\r",
+									"    console.log(jwt);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Bucu\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users/2/personal-info",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"2",
+								"personal-info"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "APP-MONITOR",
+			"item": [
+				{
+					"name": "Healthcheck",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8360ebe1-75a9-4878-925e-7757ee447360",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/status/health",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"status",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "606377d3-f256-4d91-a0e0-e3cdd7194cad",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "47d3771d-ac9d-4d2d-8bc0-29559efbb6d7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

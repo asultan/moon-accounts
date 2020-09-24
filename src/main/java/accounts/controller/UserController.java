@@ -10,9 +10,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Slf4j
@@ -48,10 +48,9 @@ public class UserController {
             @ApiResponse(code = 400, message = "Something went wrong"),
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public List<UserResponseDTO> findAll(@ApiParam(value = "Fetch the personal info") @Nullable @RequestParam Boolean fetchPersonalInfo) {
+    public CompletableFuture<List<UserResponseDTO>> findAll() {
         log.debug("Handling GET request on path => {}", PATH_USERS);
-
-        return userService.findAll(fetchPersonalInfo);
+        return userService.findAll();
     }
 
     @GetMapping(value = "/{id}")
@@ -62,13 +61,14 @@ public class UserController {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 404, message = "The user doesn't exist"),
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public UserResponseDTO findById(@ApiParam(value = "User ID to find", required = true, example = "0") @PathVariable Long id) {
+    public CompletableFuture<UserResponseDTO> findById(@ApiParam(value = "User ID to find", required = true, example = "0") @PathVariable Long id) {
         log.debug("Handling GET request on path => {}/{}", PATH_USERS, id);
         final var userResponseDto = userService.findById(id);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
+    @SneakyThrows
     @PatchMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     @ApiOperation(value = "${UserController.updatePasswordById}", response = UserResponseDTO.class)
@@ -77,14 +77,15 @@ public class UserController {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 404, message = "The user doesn't exist"),
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public UserResponseDTO updatePasswordById(@ApiParam(value = "User ID to update", required = true, example = "0") @PathVariable Long id,
-                                      @ApiParam("User Details") @RequestBody UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO) {
+    public CompletableFuture<UserResponseDTO> updatePasswordById(@ApiParam(value = "User ID to update", required = true, example = "0") @PathVariable Long id,
+                                                                 @ApiParam("User Details") @RequestBody UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO) {
         log.debug("Handling PUT request on path => {}/{}. Request body => {}", PATH_USERS, id, updateUserPasswordRequestDTO);
         final var userResponseDto = userService.updatePasswordById(id, updateUserPasswordRequestDTO);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
+    @SneakyThrows
     @PatchMapping(value = "/{id}" + PATH_PERSONAL_INFO)
     @PreAuthorize("hasAuthority('USER')")
     @ApiOperation(value = "${UserController.updatePersonalInfo}", response = UserResponseDTO.class)
@@ -93,8 +94,8 @@ public class UserController {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 404, message = "The user doesn't exist"),
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public UserResponseDTO updatePersonalInfo(@ApiParam(value = "User ID to update", required = true, example = "0") @PathVariable Long id,
-                                              @ApiParam("User Personal Information") @RequestBody UpdateUserPersonalInfoRequestDTO updateUserPersonalInfoRequestDto) {
+    public CompletableFuture<UserResponseDTO> updatePersonalInfo(@ApiParam(value = "User ID to update", required = true, example = "0") @PathVariable Long id,
+                                                                 @ApiParam("User Personal Information") @RequestBody UpdateUserPersonalInfoRequestDTO updateUserPersonalInfoRequestDto) {
         log.debug("Handling PUT request on path => {}/{}{}. Request body => {}", PATH_USERS, id, PATH_PERSONAL_INFO, updateUserPersonalInfoRequestDto);
         final var userResponseDto = userService.updatePersonalInfo(id, updateUserPersonalInfoRequestDto);
         log.debug("Response => {}", userResponseDto);

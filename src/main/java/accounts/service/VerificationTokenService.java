@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

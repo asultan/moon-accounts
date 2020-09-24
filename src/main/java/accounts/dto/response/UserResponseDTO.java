@@ -2,7 +2,6 @@ package accounts.dto.response;
 
 import accounts.model.Role;
 import accounts.model.UserPersonalInfo;
-import accounts.model.VerificationToken;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
