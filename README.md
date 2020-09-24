@@ -32,16 +32,17 @@ $ scripts/build.sh
 
 ```sh
 $ docker pull asultandev/accounts:1.0.0
-$ docker run --name accounts -p 8081:8081 -d asultandev/accounts:1.0.0
+$ docker run --name accounts -p 8081:8081 -d asultandev/moon-accounts:1.0.0
 ```
 
 # How to use the service without Docker
 
-Make sure you have [Java 8](https://www.java.com/download/) and [Maven](https://maven.apache.org) installed and the `JAVA_HOME` is set to point to your JDK installation folder.
+Make sure you have [Java 8](https://www.java.com/download/) and [Maven](https://maven.apache.org) installed and the `JAVA_HOME` is set to point to your JDK
+ installation folder.
 
 Fork this accounts.repository and clone it
 ```sh
-$ git clone https://<your_user>@bitbucket.org/d-menu/accounts.git
+$ git clone https://github.com/asultan/moon-accounts.git
 ```
 
 Navigate into the folder  
@@ -59,40 +60,42 @@ Run the project
 $ mvn spring-boot:run
 ```
 
-Navigate to [Service API UI](http://localhost:8081/accounts) in your browser to check everything is working correctly and to understand the API. You can change the default port in the following `application.properties` file
+Navigate to [Service API UI](http://localhost:8081/accounts) in your browser to check everything is working correctly and to understand the API. You can
+ change the default port in the following `application.properties` file.
 ```
 server.por=8081
 ```
 
-Make a GET request to `/accounts/whoami` to check you're not authenticated. You should receive a response with a `403` with an `Access Denied` message since you haven't set your valid JWT token yet
+Make a GET request to `/accounts/whoami` to check you're not authenticated. You should receive a response with a `403` with an `Access Denied` message since
+ you haven't set your valid JWT token yet.
 ```sh
 $ curl -X GET http://localhost:8081/accounts/whoami
 ```
 
-Make a POST request to `/accounts/security/login` with the default admin user (that we programmatically created) to get a valid JWT token
+Make a POST request to `/accounts/security/login` with the default admin user (that we programmatically created) to get a valid JWT token:
 ```sh
 $ curl -X POST 'http://localhost:8081/accounts/login
 body: 
 {
-    "email": "god@email.com",
-    "password": "god!"
+    "email": "admin@moon.io",
+    "password": "admin"
 }
 
 ```
 
-Add the JWT token as a Header parameter and make the initial GET request to `/accounts/security/whoami` again
+Add the JWT token as a Header parameter and make the initial GET request to `/accounts/security/whoami` again:
 ```
 $ curl -X GET http://localhost:8081/accounts/whoami -H 'Authorization: Bearer <JWT_TOKEN>'
 ```
 
-And that's it, congrats! You should get a similar response to this one, meaning that you're now authenticated
+And that's it, congrats! You should get a similar response to this one, meaning you're now authenticated.
 ```javascript
 {
   "id": 1,
-  "email": "god@email.com",
+  "email": "admin@moon.io",
   "role": {
     "id": 1,
-    "authority": "GOD"    
+    "authority": "ADMIN"    
    }
 }
 ```

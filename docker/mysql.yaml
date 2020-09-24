@@ -5,6 +5,7 @@ services:
 
   db:
     image: mysql
+    container_name: moon-db
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
