@@ -9,55 +9,55 @@
 ![](https://img.shields.io/badge/jwt-✓-blue.svg)
 ![](https://img.shields.io/badge/swagger_2-✓-blue.svg)
 
-# Pre-requisites
-While using the commands below to operate the applicatio, we will assume that you have the following folder structure:
+# How to run the application
+
+In order to to operate the application following the instructions below, you must have the following folder structure on your host:
+
 ```sh
 moon
  |__ moon-accounts
  |__ moon-deploy
- 
 ```
-All the coomands must be run from the **moon** folder.
 
-# Storage Details
-This service is using a MySQL database, configured to run locally. A default user can be created when the app starts. 
-To enable this change the `accounts.database.DefaultDataInitializer.initData` property to `true`.
-To start the mysql server run:
+1. Create the project root folder called **moon**:
+
 ```sh
-docker run --name mysql -p 3306:3306 -v <your_local_storage_folder>:/var/lib/mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -d mysql
+mkdir moon
 ```
-E.g.:
+
+2. Clone the two repositories from the **moon** folder:
+
 ```sh
-docker run --name mysql -p 3306:3306 -v D:\dev\mysql-data:/var/lib/mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -d mysql
+git clone https://github.com/asultan/moon-accounts.git
+git clone https://github.com/asultan/moon-deploy.git
+```
+
+Going further, all the coomands must be run from the **moon** folder.
+
+3. Start the shared services (database, etc):
+
+```sh
+docker-compose -f moon-accounts/docker/shared-services.yaml up
+```
+
+4. Start the moon services:
+
+```sh
+$ docker run --name accounts -p 8081:8081 -d asultandev/moon-accounts:1.0.0
 ```
 
 # How to push image to docker registry
 
 ```sh
 $ docker login -u asultandev
-$ scripts/build.sh
-```
-
-# How to use the service with Docker
-
-```sh
-$ docker pull asultandev/accounts:1.0.0
-$ docker run --name accounts -p 8081:8081 -d asultandev/accounts:1.0.0
+$ moon-deploy/build.sh
 ```
 
 # How to use the service without Docker
 
-Make sure you have [Java 8](https://www.java.com/download/) and [Maven](https://maven.apache.org) installed and the `JAVA_HOME` is set to point to your JDK installation folder.
+Make sure you have [Java 11](https://www.java.com/download/) and [Maven](https://maven.apache.org) installed and the `JAVA_HOME` is set to point to your JDK installation folder.
 
-Fork this accounts.repository and clone it
-```sh
-$ git clone https://<your_user>@bitbucket.org/d-menu/accounts.git
-```
-
-Navigate into the folder  
-```sh
-$ cd accounts
-```
+Navigate into the folder moon-accounts folder. Update the `application.properties` file so that `datasource.mysql.host = localhost`
 
 Install dependencies
 ```sh
@@ -74,9 +74,9 @@ Navigate to [Service API UI](http://localhost:8081/accounts) in your browser to 
 server.por=8081
 ```
 
-Make a GET request to `/accounts/whoami` to check you're not authenticated. You should receive a response with a `403` with an `Access Denied` message since you haven't set your valid JWT token yet
+Make a GET request to `/accounts/security/whoami` to check you're not authenticated. You should receive a response with a `403` with an `Access Denied` message since you haven't set your valid JWT token yet
 ```sh
-$ curl -X GET http://localhost:8081/accounts/whoami
+$ curl -X GET http://localhost:8081/accounts/security/whoami
 ```
 
 Make a POST request to `/accounts/security/login` with the default admin user (that we programmatically created) to get a valid JWT token
