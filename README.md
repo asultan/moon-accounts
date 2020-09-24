@@ -127,4 +127,4 @@ Go to Postman and perform the following operations and observe what happens:
 - After the 20s delay, the first request will return a response.  
 
 # Do you have questions?
-Feel free to contant me at sultanalex@gmail.com
+Feel free to contact me at sultanalex@gmail.com
