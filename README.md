@@ -46,7 +46,7 @@ Going further, all the coomands must be run from the **moon** folder.
 4. Start the moon services:
 
 ```sh
-$ ./moon-deploy/start-service.sh moon-accounts 8081
+./moon-deploy/start-service.sh moon-accounts 8081
 ```
 
 # How to use the service without Docker
@@ -65,12 +65,12 @@ cd moon-accounts
 
 Install dependencies
 ```sh
-$ mvn install
+mvn install
 ```
 
 Run the project
 ```sh
-$ mvn spring-boot:run
+mvn spring-boot:run
 ```
 
 Navigate to [Service API UI](http://localhost:8081/accounts) in your browser to check everything is working correctly and to understand the API. You can change the default port in the `application.properties` file
@@ -80,12 +80,12 @@ server.por=8081
 
 Make a GET request to `/accounts/security/whoami` to check you're not authenticated. You should receive a response with a `403` with an `Access Denied` message since you haven't set your valid JWT token yet
 ```sh
-$ curl -X GET http://localhost:8081/accounts/security/whoami
+curl -X GET http://localhost:8081/accounts/security/whoami
 ```
 
 Make a POST request to `/accounts/security/login` with the default admin user (that we programmatically created) to get a valid JWT token
 ```sh
-$ curl -X POST 'http://localhost:8081/accounts/security/login
+curl -X POST 'http://localhost:8081/accounts/security/login
 body: 
 {
     "email": "admin@moon.io",
@@ -95,7 +95,7 @@ body:
 ```
 Add the JWT token as a Header parameter and make the initial GET request to `/accounts/security/whoami` again
 ```
-$ curl -X GET http://localhost:8081/accounts/whoami -H 'Authorization: Bearer <JWT_TOKEN>'
+curl -X GET http://localhost:8081/accounts/whoami -H 'Authorization: Bearer <JWT_TOKEN>'
 ```
 
 And that's it, congrats! You should get a similar response to this one, meaning that you're now authenticated
