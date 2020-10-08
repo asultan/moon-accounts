@@ -1,16 +1,16 @@
 package accounts.controller;
 
-import accounts.config.SwaggerConfig;
 import accounts.dto.request.UpdateUserPasswordRequestDTO;
 import accounts.dto.request.UpdateUserPersonalInfoRequestDTO;
 import accounts.dto.response.UserResponseDTO;
 import accounts.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import lombok.SneakyThrows;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @Slf4j
 @RequestMapping(UserController.PATH_USERS)
-@Api(tags = SwaggerConfig.USERS_TAG)
 public class UserController {
 
     public static final String PATH_USERS = "/users";
@@ -41,76 +40,194 @@ public class UserController {
         this.userService = userService;
     }
 
+
+    @Operation(summary = "Find all users")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful response",
+                    content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @GetMapping(value = "")
     @PreAuthorize("hasAuthority('ADMIN')")
-    @ApiOperation(value = "${UserController.findAll}", response = UserResponseDTO.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Something went wrong"),
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public CompletableFuture<List<UserResponseDTO>> findAll() {
         log.debug("Handling GET request on path => {}", PATH_USERS);
         return userService.findAll();
     }
 
+
+    @Operation(summary = "Find user by id")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The user doesn't exist",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    @ApiOperation(value = "${UserController.findById}", response = UserResponseDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Something went wrong"),
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 404, message = "The user doesn't exist"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public CompletableFuture<UserResponseDTO> findById(@ApiParam(value = "User ID to find", required = true, example = "0") @PathVariable Long id) {
+    public CompletableFuture<UserResponseDTO> findById(
+            @Parameter(description = "User ID to find", required = true, example = "1") @PathVariable Long id) {
         log.debug("Handling GET request on path => {}/{}", PATH_USERS, id);
         final var userResponseDto = userService.findById(id);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
-    @SneakyThrows
+
+    @Operation(summary = "Update user's password")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The user doesn't exist",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @PatchMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-    @ApiOperation(value = "${UserController.updatePasswordById}", response = UserResponseDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Something went wrong"),
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 404, message = "The user doesn't exist"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public CompletableFuture<UserResponseDTO> updatePasswordById(@ApiParam(value = "User ID to update", required = true, example = "0") @PathVariable Long id,
-                                                                 @ApiParam("User Details") @RequestBody UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO) {
+    public CompletableFuture<UserResponseDTO> updatePasswordById(
+            @Parameter(description = "User ID to update", required = true, example = "0") @PathVariable Long id,
+            @Parameter(description = "User Details") @RequestBody UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO) {
         log.debug("Handling PUT request on path => {}/{}. Request body => {}", PATH_USERS, id, updateUserPasswordRequestDTO);
         final var userResponseDto = userService.updatePasswordById(id, updateUserPasswordRequestDTO);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
-    @SneakyThrows
+
+    @Operation(summary = "Update user's personal info")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The user doesn't exist",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @PatchMapping(value = "/{id}" + PATH_PERSONAL_INFO)
     @PreAuthorize("hasAuthority('USER')")
-    @ApiOperation(value = "${UserController.updatePersonalInfo}", response = UserResponseDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Something went wrong"),
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 404, message = "The user doesn't exist"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public CompletableFuture<UserResponseDTO> updatePersonalInfo(@ApiParam(value = "User ID to update", required = true, example = "0") @PathVariable Long id,
-                                                                 @ApiParam("User Personal Information") @RequestBody UpdateUserPersonalInfoRequestDTO updateUserPersonalInfoRequestDto) {
+    public CompletableFuture<UserResponseDTO> updatePersonalInfo(
+            @Parameter(description = "User ID to update", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "User Personal Information") @RequestBody UpdateUserPersonalInfoRequestDTO updateUserPersonalInfoRequestDto) {
         log.debug("Handling PUT request on path => {}/{}{}. Request body => {}", PATH_USERS, id, PATH_PERSONAL_INFO, updateUserPersonalInfoRequestDto);
         final var userResponseDto = userService.updatePersonalInfo(id, updateUserPersonalInfoRequestDto);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
+
+    @Operation(summary = "Delete user by id")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The user doesn't exist",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    @ApiOperation(value = "${UserController.deleteById}")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Something went wrong"),
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 404, message = "The user doesn't exist"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public void deleteById(@ApiParam(value = "User ID to delete", required = true, example = "0") @PathVariable Long id) {
+    public void deleteById(
+            @Parameter(description = "User ID to delete", required = true, example = "0") @PathVariable Long id) {
         log.debug("Handling DELETE request on path => {}/{}", PATH_USERS, id);
         userService.deleteById(id);
         log.debug("Response => {}", "OK");

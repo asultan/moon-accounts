@@ -3,11 +3,9 @@ package accounts.event;
 import accounts.model.User;
 import accounts.model.VerificationToken;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-@Data
 @Getter
 @Builder
 public class RegisterUserEvent extends ApplicationEvent {

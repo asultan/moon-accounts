@@ -1,12 +1,14 @@
 package accounts.controller;
 
-import accounts.config.SwaggerConfig;
 import accounts.dto.response.RoleResponseDTO;
+import accounts.dto.response.UserResponseDTO;
 import accounts.service.RoleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +21,6 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(RoleController.PATH_ROLES)
-@Api(tags = SwaggerConfig.ROLES_TAG)
 public class RoleController {
 
     public static final String PATH_ROLES = "/roles";
@@ -31,13 +32,32 @@ public class RoleController {
         this.roleService = roleService;
     }
 
+    @Operation(summary = "Find all roles")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RoleResponseDTO.class)))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @GetMapping(value = "")
     @PreAuthorize("hasAuthority('ADMIN')")
-    @ApiOperation(value = "${RoleController.findAll}", response = RoleResponseDTO.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Something went wrong"),
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public List<RoleResponseDTO> findAll() {
         log.debug("Handling GET request on path: {}", PATH_ROLES);
         return roleService.findAll();

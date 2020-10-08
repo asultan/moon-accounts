@@ -1,6 +1,5 @@
 package accounts.dto.request;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +13,5 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 public class UpdateUserPasswordRequestDTO {
 
-    @ApiModelProperty
     private String password;
 }

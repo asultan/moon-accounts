@@ -1,6 +1,5 @@
 package accounts.dto.request;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,15 +16,11 @@ import javax.validation.constraints.NotBlank;
 public class RegisterUserRequestDTO {
 
     @NotBlank
-    @ApiModelProperty
     private String email;
 
-    @ApiModelProperty
     private String firstName;
 
-    @ApiModelProperty
     private String lastName;
 
-    @ApiModelProperty
     private String phoneNumber;
 }

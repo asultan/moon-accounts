@@ -16,6 +16,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
         <start-class>accounts.Application</start-class>
+
+        <!-- Dependencies Versions -->
+        <version.springdoc>1.4.8</version.springdoc>
+        <version.swagger-core-v3.api>2.1.5</version.swagger-core-v3.api>
+        <version.swagger-ui>3.35.0</version.swagger-ui>
+        <version.jsonwebtoken.jjwt>0.9.1</version.jsonwebtoken.jjwt>
+        <version.javax.validation.api>2.0.1.Final</version.javax.validation.api>
+        <version.modelmapper>2.3.8</version.modelmapper>
+        <version.lombok>1.18.12</version.lombok>
+        <version.google.guava>29.0-jre</version.google.guava>
+        <version.archunit>0.14.1</version.archunit>
     </properties>
 
 
@@ -58,47 +69,86 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Automated JSON API documentation for API's built with Spring -->
+        <!-- JSON API documentation for Spring based applications -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${version.springdoc}</version>
+
         </dependency>
 
-        <!-- Generate beautiful documentation from a Swagger-compliant API. -->
+        <!-- Swagger -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>${version.swagger-core-v3.api}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${version.swagger-core-v3.api}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-integration</artifactId>
+            <version>${version.swagger-core-v3.api}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.github.classgraph</groupId>
+                    <artifactId>classgraph</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>${version.swagger-ui}</version>
         </dependency>
 
         <!-- JSON Web Token Support -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
+            <version>${version.jsonwebtoken.jjwt}</version>
         </dependency>
 
         <!-- Model validations -->
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
+            <version>${version.javax.validation.api}</version>
         </dependency>
 
         <!-- Model Mapper -->
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version>2.3.5</version>
+            <version>${version.modelmapper}</version>
         </dependency>
 
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>${version.lombok}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Suite of core and expanded libraries that include utility classes, google's collections, io classes, etc -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.google.guava}</version>
+        </dependency>
+
+        <!-- Testing - ArchUnit -->
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${version.archunit}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

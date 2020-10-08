@@ -1,16 +1,16 @@
 package accounts.controller;
 
-import accounts.config.SwaggerConfig;
 import accounts.dto.request.ActivateUserRequestDTO;
 import accounts.dto.request.LoginRequestDTO;
 import accounts.dto.request.RegisterUserRequestDTO;
 import accounts.dto.response.UserResponseDTO;
 import accounts.service.SecurityService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Slf4j
 @RequestMapping(SecurityController.PATH_SECURITY)
-@Api(tags = SwaggerConfig.SECURITY_TAG)
 public class SecurityController {
 
     public static final String PATH_SECURITY = "/security";
@@ -45,40 +44,92 @@ public class SecurityController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping(PATH_LOGIN)
-    @ApiOperation(value = "${SecurityController.login}", response = UserResponseDTO.class)
+
+    @Operation(summary = "Authenticate user and return corresponding JWT")
     @ApiResponses(value = {
-            @ApiResponse(code = 401, message = "Invalid credentials"),
-            @ApiResponse(code = 401, message = "User not activated"),
-            @ApiResponse(code = 500, message = "Something went wrong")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User not activated",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
     })
-    public UserResponseDTO login(@ApiParam("Login User Credentials") @RequestBody LoginRequestDTO loginRequestDto) {
+    @PostMapping(PATH_LOGIN)
+    public UserResponseDTO login(
+            @Parameter(description = "Login User Credentials") @RequestBody LoginRequestDTO loginRequestDto) {
         log.debug("Handling POST request on path => {}{}. Request body => {}", PATH_SECURITY, PATH_LOGIN, loginRequestDto);
         final var userResponseDto = securityService.login(loginRequestDto);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
-    @PostMapping(PATH_REGISTER_USER)
-    @ApiOperation(value = "${SecurityController.registerUser}", response = UserResponseDTO.class)
+
+    @Operation(summary = "Create user and returns its JWT")
     @ApiResponses(value = {
-            @ApiResponse(code = 406, message = "Username is already in use"),
-            @ApiResponse(code = 500, message = "Something went wrong")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "406",
+                    description = "Username is already in use",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
     })
-    public UserResponseDTO registerUser(@ApiParam("Register User Information") @RequestBody RegisterUserRequestDTO registerUserRequestDto) {
+    @PostMapping(PATH_REGISTER_USER)
+    public UserResponseDTO registerUser(
+            @Parameter(description = "Register User Information") @RequestBody RegisterUserRequestDTO registerUserRequestDto) {
         log.debug("Handling POST request on path => {}{}. Request body => {}", PATH_SECURITY, PATH_REGISTER_USER, registerUserRequestDto);
         final var userResponseDto = securityService.registerUser(registerUserRequestDto);
         log.debug("Response => {}", userResponseDto);
         return userResponseDto;
     }
 
-    @PostMapping(PATH_ACTIVATE_USER)
-    @ApiOperation(value = "${SecurityController.activateUser}", response = UserResponseDTO.class)
+
+    @Operation(summary = "Activate an user and set password")
     @ApiResponses(value = {
-            @ApiResponse(code = 406, message = "Expired or invalid verification token"),
-            @ApiResponse(code = 500, message = "Something went wrong")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "406",
+                    description = "Expired or invalid verification token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
     })
-    public UserResponseDTO activateUser(@ApiParam("User Activation Information") @RequestBody ActivateUserRequestDTO activateUserRequestDto) {
+    @PostMapping(PATH_ACTIVATE_USER)
+    public UserResponseDTO activateUser(@Parameter(description = "User Activation Information") @RequestBody ActivateUserRequestDTO activateUserRequestDto) {
         log.debug("Handling POST request on path => {}{}. Request body => {}", PATH_SECURITY, PATH_ACTIVATE_USER, activateUserRequestDto);
         final var activateUserResponseDTO = securityService.activateUser(activateUserRequestDto);
         final var loginUserResponseDto = securityService.login(LoginRequestDTO.builder()
@@ -89,14 +140,39 @@ public class SecurityController {
         return loginUserResponseDto;
     }
 
+
+    @Operation(summary = "Retrieve current user's data based on request JWT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Expired or invalid JWT token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @GetMapping(PATH_WHOAMI)
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @ApiOperation(value = "${SecurityController.whoami}", response = UserResponseDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 500, message = "Something went wrong"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")
-    })
     public UserResponseDTO whoami(HttpServletRequest request) {
         log.debug("Handling GET request on path => {}{}", PATH_SECURITY, PATH_WHOAMI);
         final var userResponseDto = modelMapper.map(securityService.whoami(request), UserResponseDTO.class);
@@ -104,14 +180,39 @@ public class SecurityController {
         return userResponseDto;
     }
 
+
+    @Operation(summary = "Refresh the current user's JWT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful operation",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials or jwt token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Something went wrong",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Expired or invalid JWT token",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}
+            )
+    })
     @PostMapping(PATH_REFRESH)
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @ApiOperation(value = "${SecurityController.refresh}")
-    @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 500, message = "Something went wrong"),
-            @ApiResponse(code = 500, message = "Expired or invalid JWT token")
-    })
     public String refresh(HttpServletRequest request) {
         log.debug("Handling GET request on path => {}{}", PATH_SECURITY, PATH_REFRESH);
         final var jwt = securityService.refresh(request.getRemoteUser());
