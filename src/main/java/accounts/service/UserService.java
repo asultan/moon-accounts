@@ -9,7 +9,6 @@ import accounts.model.User;
 import accounts.model.UserPersonalInfo;
 import accounts.repository.UserRepository;
 import com.google.common.base.Strings;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,8 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static accounts.util.Utils.sleep;
 
 @Service
 @Transactional
@@ -42,10 +43,10 @@ public class UserService {
         this.modelMapper = modelMapper;
     }
 
-    @SneakyThrows
     @Async("asyncExecutor")
     public CompletableFuture<List<UserResponseDTO>> findAll() {
-        Thread.sleep(20000); // artificial delay
+        sleep(5);
+
         log.debug("Finding all users");
         final var users = userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserResponseDTO.class))
